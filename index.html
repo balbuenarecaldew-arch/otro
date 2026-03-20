@@ -142,6 +142,8 @@
     </div>
     <div id="weeksContainer"></div>
     <button class="download-btn" id="downloadBtn">⬇ Descargar todo organizado en carpetas</button>
+    <button id="diagBtn" style="display:block;margin:8px auto 0;background:none;border:1px solid #aaa;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;color:#666;">🔍 Ver diagnóstico del ZIP</button>
+    <pre id="diagBox" style="display:none;background:#f4f4f0;padding:12px;border-radius:8px;font-size:12px;margin-top:10px;max-height:200px;overflow:auto;"></pre>
   </div>
 
 </div>
@@ -194,6 +196,7 @@ async function handleFile(file) {
 
   setProgress(60, 'Clasificando por semanas...');
   parsedData = parseChat(txtContent, mediaFiles);
+  parsedData._mediaKeys = mediaFiles;
   setProgress(90, 'Construyendo vista...');
 
   renderResults(parsedData);
@@ -247,9 +250,15 @@ function parseChat(text, mediaFiles) {
     const { key, label } = getWeekKey(date);
     if (!weeks[key]) weeks[key] = { label, key, messages: [], media: [] };
 
-    const mediaMatch = body.match(mediaRegex);
-    const fileMatch = body.match(fileNameRegex);
-    const attachedName = mediaMatch ? (mediaMatch[1] || mediaMatch[2]) : (fileMatch ? fileMatch[1] : null);
+    const cleanBody = body.replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, '').trim();
+    const mA = cleanBody.match(/<adjunto:\s*(.+?)>/i) || cleanBody.match(/<attached:\s*(.+?)>/i) ||
+               cleanBody.match(/^([^\s].+?\.(jpg|jpeg|png|gif|webp|mp4|3gp|mov|opus|ogg|mp3|wav|aac|pdf|doc|docx|xls|xlsx))\s*(?:\(archivo adjunto\)|\(file attached\)|omitido|omitted)?$/i);
+    const mB = cleanBody.match(/([^\s\/\\]+\.(jpg|jpeg|png|gif|webp|mp4|3gp|mov|opus|ogg|mp3|wav|aac|pdf|doc|docx|xls|xlsx))/i);
+    let attachedName = mA ? mA[1].trim() : (mB ? mB[1].trim() : null);
+    if (attachedName && !mediaFiles[attachedName]) {
+      const found = Object.keys(mediaFiles).find(k => k.toLowerCase() === attachedName.toLowerCase());
+      if (found) attachedName = found; else attachedName = null;
+    }
 
     if (attachedName) {
       const ext = attachedName.split('.').pop().toLowerCase();
@@ -357,7 +366,20 @@ function escapeHtml(t) {
   return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-document.getElementById('downloadBtn').addEventListener('click', async () => {
+document.getElementById('diagBtn').addEventListener('click', () => {
+  if (!parsedData) return;
+  const box = document.getElementById('diagBox');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+  let txt = '=== ARCHIVOS EN EL ZIP ===\n';
+  txt += Object.keys(parsedData._mediaKeys || {}).map(k => '  ' + k).join('\n') || '  (ninguno detectado)';
+  txt += '\n\n=== ARCHIVOS REFERENCIADOS EN CHAT ===\n';
+  for (const w of parsedData.weeks) {
+    for (const m of w.media) {
+      txt += `  ${m.name} → ${m.mediaRef ? 'ENCONTRADO ✓' : 'NO ENCONTRADO ✗'}\n`;
+    }
+  }
+  box.textContent = txt;
+});
   if (!parsedData) return;
   const btn = document.getElementById('downloadBtn');
   btn.disabled = true; btn.textContent = 'Generando ZIP...';
@@ -375,9 +397,6 @@ document.getElementById('downloadBtn').addEventListener('click', async () => {
     for (const m of week.media) {
       if (m.mediaRef && m.mediaRef.data) {
         folder.file(m.name, m.mediaRef.data);
-      } else {
-        const notFound = folder.file('archivos-faltantes.txt', '', {createFolders: false});
-        folder.file('archivos-faltantes.txt', m.name + '\n');
       }
     }
   }
