@@ -171,17 +171,24 @@ async function handleFile(file) {
   let txtContent = '';
   const mediaFiles = {};
 
+  const mediaPromises = [];
   for (const [name, entry] of Object.entries(content.files)) {
     const fname = name.split('/').pop();
-    if (!entry.dir) {
+    if (!entry.dir && fname) {
       if (fname.endsWith('.txt') && !txtFile) {
         txtContent = await entry.async('string');
         txtFile = fname;
-      } else {
-        mediaFiles[fname] = entry;
+      } else if (fname.match(/\.(jpg|jpeg|png|gif|webp|mp4|3gp|mov|opus|ogg|mp3|wav|aac|pdf|doc|docx|xls|xlsx)$/i)) {
+        mediaPromises.push(
+          entry.async('uint8array').then(data => {
+            mediaFiles[fname] = { data, entry };
+          })
+        );
       }
     }
   }
+  setProgress(45, 'Leyendo archivos multimedia...');
+  await Promise.all(mediaPromises);
 
   if (!txtContent) { alert('No se encontró el archivo de mensajes .txt dentro del ZIP. Asegurate de exportar el chat correctamente.'); return; }
 
@@ -251,7 +258,8 @@ function parseChat(text, mediaFiles) {
       else if (['mp4','3gp','mov'].includes(ext)) { type = 'video'; totalVideo++; }
       else if (['opus','ogg','mp3','wav','aac'].includes(ext)) { type = 'audio'; totalAudio++; }
       else { totalDoc++; }
-      weeks[key].media.push({ name: attachedName, type, date: dateStr, time: timeStr, sender, entry: mediaFiles[attachedName] });
+      const mediaRef = mediaFiles[attachedName] || null;
+      weeks[key].media.push({ name: attachedName, type, date: dateStr, time: timeStr, sender, mediaRef });
     } else {
       totalMsg++;
       weeks[key].messages.push({ date: dateStr, time: timeStr, sender, body });
@@ -365,16 +373,18 @@ document.getElementById('downloadBtn').addEventListener('click', async () => {
     }
 
     for (const m of week.media) {
-      if (m.entry) {
-        const data = await m.entry.async('uint8array');
-        folder.file(m.name, data);
+      if (m.mediaRef && m.mediaRef.data) {
+        folder.file(m.name, m.mediaRef.data);
       } else {
-        folder.file('archivos-no-disponibles.txt', m.name + '\n', { createFolders: false });
+        const notFound = folder.file('archivos-faltantes.txt', '', {createFolders: false});
+        folder.file('archivos-faltantes.txt', m.name + '\n');
       }
     }
   }
 
-  const blob = await zip.generateAsync({ type: 'blob' });
+  const blob = await zip.generateAsync({ type: 'blob', streamFiles: true }, (metadata) => {
+    btn.textContent = `Comprimiendo... ${Math.round(metadata.percent)}%`;
+  });
   saveAs(blob, 'obra-organizada.zip');
   btn.disabled = false; btn.innerHTML = '⬇ Descargar todo organizado en carpetas';
 });
