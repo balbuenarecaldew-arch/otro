@@ -11,7 +11,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, sans-serif; background: #f4f4f0; color: #1a1a1a; min-height: 100vh; }
 
-  .header { background: #7f1d1d; color: white; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 12px; }
+  .header { background: #0e7490; color: white; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 12px; }
   .header h1 { font-size: 18px; font-weight: 500; }
   .header p { font-size: 13px; opacity: 0.8; margin-top: 2px; }
 
@@ -202,7 +202,8 @@ async function handleFile(file) {
 
   setProgress(50, 'Leyendo archivos multimedia...');
   await Promise.all(mediaPromises);
-  setProgress(70, 'Clasificando por semanas...');
+  setProgress(70, 'Clasificando por períodos de 20 días...');
+  firstMessageDate = null;
 
   if (!txtContent) {
     alert('No se encontró el archivo de mensajes .txt. Exportá el chat desde WhatsApp correctamente.');
@@ -218,14 +219,19 @@ async function handleFile(file) {
   document.getElementById('statsSection').style.display = 'block';
 }
 
-function getWeekKey(date) {
-  var d = new Date(date);
-  var day = d.getDay();
-  var diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  var mon = new Date(d.getFullYear(), d.getMonth(), diff);
-  var sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6);
-  function fmt(d2) { return d2.toLocaleDateString('es-PY', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
-  return { key: mon.toISOString().slice(0, 10), label: 'Semana del ' + fmt(mon) + ' al ' + fmt(sun) };
+// firstDate se setea al parsear el primer mensaje
+var firstMessageDate = null;
+
+function getPeriodKey(date) {
+  if (!firstMessageDate) firstMessageDate = new Date(date);
+  const diff = Math.floor((date - firstMessageDate) / (1000 * 60 * 60 * 24));
+  const periodIndex = Math.floor(diff / 20);
+  const start = new Date(firstMessageDate);
+  start.setDate(start.getDate() + periodIndex * 20);
+  const end = new Date(start);
+  end.setDate(end.getDate() + 19);
+  function fmt(d) { return d.toLocaleDateString('es-PY', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
+  return { key: 'periodo-' + periodIndex, label: 'Período ' + fmt(start) + ' al ' + fmt(end) };
 }
 
 function parseDate(str) {
@@ -278,7 +284,7 @@ function parseChat(text, mediaFiles) {
     var dateStr = match[1], timeStr = match[2], sender = match[3], body = match[4];
     var date = parseDate(dateStr);
     if (!date) continue;
-    var wk = getWeekKey(date);
+    var wk = getPeriodKey(date);
     if (!weeks[wk.key]) weeks[wk.key] = { label: wk.label, key: wk.key, messages: [], media: [] };
 
     var attachedName = detectAttachment(body, mediaFiles);
@@ -405,24 +411,33 @@ document.getElementById('downloadBtn').addEventListener('click', async function(
   const zip = new JSZip();
 
   for (let i = 0; i < parsedData.weeks.length; i++) {
-    const week = parsedData.weeks[i];
-    const folderName = week.label.replace(/[\/\\:*?"<>|]/g, '-');
+    const period = parsedData.weeks[i];
+    const folderName = period.label.replace(/[\/\\:*?"<>|]/g, '-');
     const folder = zip.folder(folderName);
 
-    // Siempre crear mensajes.txt aunque no haya mensajes
-    const txtLines = week.messages.length
-      ? week.messages.map(m => '[' + m.date + ' ' + m.time + '] ' + m.sender + ': ' + m.body).join('\n')
-      : '(sin mensajes de texto esta semana)';
+    // mensajes.txt
+    const txtLines = period.messages.length
+      ? period.messages.map(m => '[' + m.date + ' ' + m.time + '] ' + m.sender + ': ' + m.body).join('\n')
+      : '(sin mensajes de texto en este período)';
     folder.file('mensajes.txt', txtLines);
 
     // Multimedia
-    for (let j = 0; j < week.media.length; j++) {
-      const mf = week.media[j];
+    for (let j = 0; j < period.media.length; j++) {
+      const mf = period.media[j];
       const data = parsedData.mediaFiles[mf.name];
       if (data) folder.file(mf.name, data);
     }
+
+    // Generar PDF del período e incluirlo en la carpeta
+    btn.textContent = 'Generando PDF ' + (i+1) + '/' + parsedData.weeks.length + '...';
+    try {
+      const pdfBytes = await generarPDFBytes(period, [period]);
+      const nombrePDF = period.label.replace(/[\/\\:*?"<>|]/g, '-') + '.pdf';
+      folder.file(nombrePDF, pdfBytes);
+    } catch(e) { console.warn('Error generando PDF para', period.label, e); }
   }
 
+  btn.textContent = 'Comprimiendo ZIP...';
   const blob = await zip.generateAsync({ type: 'blob' }, function(meta) {
     btn.textContent = 'Comprimiendo... ' + Math.round(meta.percent) + '%';
   });
@@ -462,26 +477,20 @@ function fmtDate(d) {
 
 function renderPdfPeriods() {
   if (!parsedData) return;
-  const periods = buildPeriods(parsedData.weeks);
   const list = document.getElementById('pdfPeriodList');
   list.innerHTML = '';
-  if (periods.length === 0) { list.innerHTML = '<div style="font-size:13px;color:#aaa;">No hay datos suficientes.</div>'; return; }
+  if (!parsedData.weeks.length) { list.innerHTML = '<div style="font-size:13px;color:#aaa;">No hay datos.</div>'; return; }
 
-  periods.forEach(function(p, idx) {
-    // Recolectar semanas que caen en este período
-    const weeksInPeriod = parsedData.weeks.filter(function(w) {
-      const d = new Date(w.key);
-      return d >= p.start && d <= p.end;
-    });
-    const totalMsg = weeksInPeriod.reduce(function(s,w){return s+w.messages.length;},0);
-    const totalMedia = weeksInPeriod.reduce(function(s,w){return s+w.media.length;},0);
-    const totalFotos = weeksInPeriod.reduce(function(s,w){return s+w.media.filter(function(m){return m.type==='foto';}).length;},0);
+  parsedData.weeks.forEach(function(period, idx) {
+    const totalMsg = period.messages.length;
+    const totalMedia = period.media.length;
+    const totalFotos = period.media.filter(function(m){return m.type==='foto';}).length;
 
     const item = document.createElement('div');
     item.className = 'pdf-period-item';
     item.innerHTML =
       '<div>' +
-        '<div class="pdf-period-label">📅 ' + fmtDate(p.start) + ' — ' + fmtDate(p.end) + '</div>' +
+        '<div class="pdf-period-label">📅 ' + period.label + '</div>' +
         '<div class="pdf-period-sub">' + totalMsg + ' mensajes · ' + totalMedia + ' archivos · ' + totalFotos + ' fotos</div>' +
       '</div>' +
       '<button class="pdf-btn" id="pdfbtn-'+idx+'">Generar PDF</button>';
@@ -489,16 +498,14 @@ function renderPdfPeriods() {
 
     document.getElementById('pdfbtn-'+idx).addEventListener('click', async function() {
       const btn = this;
-      btn.disabled = true;
-      btn.textContent = 'Generando...';
-      await generarPDF(p, weeksInPeriod, idx);
-      btn.disabled = false;
-      btn.textContent = 'Generar PDF';
+      btn.disabled = true; btn.textContent = 'Generando...';
+      await generarPDF(period, [period], idx);
+      btn.disabled = false; btn.textContent = 'Generar PDF';
     });
   });
 }
 
-async function generarPDF(periodo, weeks, idx) {
+async function generarPDFBytes(periodo, weeks) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const W = 190, marginL = 10, marginT = 15;
@@ -513,14 +520,11 @@ async function generarPDF(periodo, weeks, idx) {
   doc.setFontSize(16); doc.setFont('helvetica','bold');
   doc.text('Memoria de Obra', marginL, y); y += 8;
   doc.setFontSize(11); doc.setFont('helvetica','normal');
-  doc.text('Período: ' + fmtDate(periodo.start) + ' al ' + fmtDate(periodo.end), marginL, y); y += 5;
+  doc.text('Período: ' + periodo.label, marginL, y); y += 5;
   doc.setDrawColor(180,180,180); doc.line(marginL, y, marginL+W, y); y += 6;
 
-  // Recorrer todas las semanas del período en orden cronológico
   for (let wi = 0; wi < weeks.length; wi++) {
     const week = weeks[wi];
-
-    // Combinar mensajes y media en una línea de tiempo ordenada por fecha+hora
     const timeline = [];
     week.messages.forEach(function(m) {
       timeline.push({ kind:'msg', date:m.date, time:m.time, sender:m.sender, body:m.body });
@@ -528,59 +532,39 @@ async function generarPDF(periodo, weeks, idx) {
     week.media.forEach(function(m) {
       timeline.push({ kind:'media', date:m.date, time:m.time, sender:m.sender, name:m.name, type:m.type });
     });
-    // Ordenar por fecha y hora
     timeline.sort(function(a,b) {
       const da = parseDate(a.date) || new Date(0);
       const db = parseDate(b.date) || new Date(0);
       if (da - db !== 0) return da - db;
       return a.time.localeCompare(b.time);
     });
-
     if (timeline.length === 0) continue;
-
-    // Encabezado de semana
-    checkPage(10);
-    doc.setFontSize(10); doc.setFont('helvetica','bold');
-    doc.setFillColor(240,240,235);
-    doc.rect(marginL, y-4, W, 7, 'F');
-    doc.text(week.label, marginL+2, y); y += 6;
 
     for (let ti = 0; ti < timeline.length; ti++) {
       const item = timeline[ti];
-
       if (item.kind === 'msg') {
         checkPage(12);
-        // Hora + remitente
         doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(100,100,100);
         doc.text(item.time + '  ' + item.sender, marginL+2, y); y += 4;
-        // Cuerpo del mensaje
         doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(30,30,30);
         const lines = doc.splitTextToSize(item.body, W-4);
-        lines.forEach(function(line) {
-          checkPage(5);
-          doc.text(line, marginL+2, y); y += 4.5;
-        });
+        lines.forEach(function(line) { checkPage(5); doc.text(line, marginL+2, y); y += 4.5; });
         y += 1;
-
       } else if (item.kind === 'media') {
         if (item.type === 'foto') {
           const data = parsedData.mediaFiles[item.name];
           if (data) {
             try {
-              // Convertir Uint8Array a base64
               let binary = '';
               const bytes = new Uint8Array(data);
               for (let b = 0; b < bytes.byteLength; b++) binary += String.fromCharCode(bytes[b]);
               const b64 = btoa(binary);
               const ext = item.name.split('.').pop().toLowerCase();
               const mime = ext === 'png' ? 'PNG' : 'JPEG';
-
               checkPage(55);
-              // Info de foto
               doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(100,100,100);
-              doc.text(item.time + '  ' + item.sender + '  🖼 ' + item.name, marginL+2, y); y += 3;
-              // Insertar imagen
-              doc.addImage('data:image/' + ext + ';base64,' + b64, mime, marginL+2, y, 80, 50, '', 'FAST');
+              doc.text(item.time + '  ' + item.sender + '  — ' + item.name, marginL+2, y); y += 3;
+              doc.addImage('data:image/'+ext+';base64,'+b64, mime, marginL+2, y, 80, 50, '', 'FAST');
               y += 53;
             } catch(e) {
               checkPage(8);
@@ -590,24 +574,29 @@ async function generarPDF(periodo, weeks, idx) {
           } else {
             checkPage(8);
             doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(150,100,0);
-            doc.text('[Foto: ' + item.name + ' — ' + item.time + ' — ' + item.sender + ']', marginL+2, y); y += 6;
+            doc.text('[Foto no disponible: ' + item.name + ' — ' + item.time + ']', marginL+2, y); y += 6;
           }
         } else {
           checkPage(8);
-          const icons = { audio:'🎤', video:'🎬', doc:'📄' };
-          const icon = icons[item.type] || '📎';
+          const icons = { audio:'[Audio]', video:'[Video]', doc:'[Doc]' };
+          const icon = icons[item.type] || '[Archivo]';
           doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(80,80,150);
-          doc.text('[' + icon + ' ' + item.name + ' — ' + item.time + ' — ' + item.sender + ']', marginL+2, y); y += 6;
+          doc.text(icon + ' ' + item.name + ' — ' + item.time + ' — ' + item.sender, marginL+2, y); y += 6;
         }
         doc.setTextColor(30,30,30);
       }
     }
-    y += 4;
+    y += 2;
   }
 
-  // Nombre del archivo con detalles del período
-  const nombreArchivo = 'Obra_' + fmtDate(periodo.start).replace(/\//g,'-') + '_al_' + fmtDate(periodo.end).replace(/\//g,'-') + '.pdf';
-  doc.save(nombreArchivo);
+  return doc.output('arraybuffer');
+}
+
+async function generarPDF(periodo, weeks, idx) {
+  const nombreArchivo = periodo.label.replace(/[\/\\:*?"<>|]/g, '-') + '.pdf';
+  const bytes = await generarPDFBytes(periodo, weeks);
+  const blob = new Blob([bytes], { type: 'application/pdf' });
+  saveAs(blob, nombreArchivo);
 }
 
 // Llamar renderPdfPeriods cada vez que se carga un ZIP
