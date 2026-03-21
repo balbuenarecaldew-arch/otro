@@ -10,23 +10,18 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, sans-serif; background: #f4f4f0; color: #1a1a1a; min-height: 100vh; }
 
-  .header { background: #1a3a5c; color: white; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 12px; }
+  .header { background: #b45309; color: white; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 12px; }
   .header h1 { font-size: 18px; font-weight: 500; }
   .header p { font-size: 13px; opacity: 0.8; margin-top: 2px; }
 
   .container { max-width: 900px; margin: 0 auto; padding: 1.5rem; }
 
   .drop-zone {
-    border: 2px dashed #aaa;
-    border-radius: 12px;
-    padding: 2.5rem;
-    text-align: center;
-    background: white;
-    cursor: pointer;
-    transition: border-color 0.2s, background 0.2s;
-    margin-bottom: 1.5rem;
+    border: 2px dashed #aaa; border-radius: 12px; padding: 2.5rem;
+    text-align: center; background: white; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s; margin-bottom: 1.5rem;
   }
-  .drop-zone:hover, .drop-zone.drag-over { border-color: #1a5c38; background: #f0f9f4; }
+  .drop-zone:hover, .drop-zone.drag-over { border-color: #b45309; background: #fff8f0; }
   .drop-zone input { display: none; }
   .drop-icon { font-size: 40px; margin-bottom: 12px; }
   .drop-zone h2 { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
@@ -35,21 +30,16 @@
 
   .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 1.5rem; }
   .stat-card { background: white; border-radius: 10px; padding: 14px; text-align: center; border: 0.5px solid #e0e0e0; }
-  .stat-card .num { font-size: 26px; font-weight: 500; color: #1a5c38; }
+  .stat-card .num { font-size: 26px; font-weight: 500; color: #b45309; }
   .stat-card .lbl { font-size: 12px; color: #888; margin-top: 4px; }
 
   .week-block { background: white; border-radius: 12px; margin-bottom: 1rem; border: 0.5px solid #e0e0e0; overflow: hidden; }
   .week-header {
-    padding: 14px 16px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    background: #f8f8f6;
-    border-bottom: 0.5px solid #e0e0e0;
-    user-select: none;
+    padding: 14px 16px; display: flex; align-items: center;
+    justify-content: space-between; cursor: pointer;
+    background: #f8f8f6; border-bottom: 0.5px solid #e0e0e0; user-select: none;
   }
-  .week-header:hover { background: #f0f9f4; }
+  .week-header:hover { background: #fff8f0; }
   .week-title { font-size: 15px; font-weight: 500; }
   .week-sub { font-size: 12px; color: #888; margin-top: 2px; }
   .week-badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
@@ -69,7 +59,7 @@
   .messages-box { background: #f8f8f6; border-radius: 8px; padding: 10px; max-height: 260px; overflow-y: auto; font-size: 13px; line-height: 1.7; }
   .msg-line { padding: 2px 0; border-bottom: 0.5px solid #eee; }
   .msg-line:last-child { border-bottom: none; }
-  .msg-sender { font-weight: 500; color: #1a5c38; }
+  .msg-sender { font-weight: 500; color: #b45309; }
   .msg-time { font-size: 11px; color: #aaa; margin-right: 4px; }
 
   .files-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 8px; margin-top: 6px; }
@@ -79,23 +69,25 @@
   .file-date { font-size: 10px; color: #999; margin-top: 3px; }
 
   .download-btn {
-    background: #1a5c38; color: white; border: none; padding: 12px 28px;
+    background: #b45309; color: white; border: none; padding: 12px 28px;
     border-radius: 8px; font-size: 14px; cursor: pointer; display: flex;
     align-items: center; gap: 8px; margin: 1.5rem auto 0; font-weight: 500;
   }
-  .download-btn:hover { background: #145030; }
+  .download-btn:hover { background: #92400e; }
   .download-btn:disabled { background: #aaa; cursor: not-allowed; }
 
   .progress { background: #e0e0e0; border-radius: 20px; height: 6px; margin: 1rem 0; overflow: hidden; }
-  .progress-bar { height: 100%; background: #1a5c38; border-radius: 20px; transition: width 0.3s; }
-
+  .progress-bar { height: 100%; background: #b45309; border-radius: 20px; transition: width 0.3s; }
   .status-msg { text-align: center; font-size: 13px; color: #666; margin: 8px 0; }
   .empty { text-align: center; padding: 2rem; color: #aaa; font-size: 14px; }
 
   .instructions { background: white; border-radius: 12px; padding: 1.2rem 1.5rem; margin-bottom: 1.5rem; border: 0.5px solid #e0e0e0; }
-  .instructions h3 { font-size: 14px; font-weight: 500; margin-bottom: 10px; color: #1a5c38; }
+  .instructions h3 { font-size: 14px; font-weight: 500; margin-bottom: 10px; color: #b45309; }
   .step { display: flex; gap: 10px; margin-bottom: 8px; align-items: flex-start; font-size: 13px; color: #555; }
-  .step-num { background: #1a5c38; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; margin-top: 1px; }
+  .step-num { background: #b45309; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; margin-top: 1px; }
+
+  .diag-btn { display: block; margin: 8px auto 0; background: none; border: 1px solid #aaa; padding: 8px 20px; border-radius: 8px; cursor: pointer; font-size: 13px; color: #666; }
+  .diag-box { display: none; background: #f4f4f0; padding: 12px; border-radius: 8px; font-size: 12px; margin-top: 10px; max-height: 200px; overflow: auto; white-space: pre; }
 </style>
 </head>
 <body>
@@ -142,22 +134,27 @@
     </div>
     <div id="weeksContainer"></div>
     <button class="download-btn" id="downloadBtn">⬇ Descargar todo organizado en carpetas</button>
-    <button id="diagBtn" style="display:block;margin:8px auto 0;background:none;border:1px solid #aaa;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:13px;color:#666;">🔍 Ver diagnóstico del ZIP</button>
-    <pre id="diagBox" style="display:none;background:#f4f4f0;padding:12px;border-radius:8px;font-size:12px;margin-top:10px;max-height:200px;overflow:auto;"></pre>
+    <button class="diag-btn" id="diagBtn">🔍 Ver diagnóstico del ZIP</button>
+    <div class="diag-box" id="diagBox"></div>
   </div>
 
 </div>
 
 <script>
-const dropZone = document.getElementById('dropZone');
-const fileInput = document.getElementById('fileInput');
-let parsedData = null;
+var dropZone = document.getElementById('dropZone');
+var fileInput = document.getElementById('fileInput');
+var parsedData = null;
 
-dropZone.addEventListener('click', () => fileInput.click());
-dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag-over'); handleFile(e.dataTransfer.files[0]); });
-fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+dropZone.addEventListener('click', function() { fileInput.click(); });
+dropZone.addEventListener('dragover', function(e) { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', function() { dropZone.classList.remove('drag-over'); });
+dropZone.addEventListener('drop', function(e) { e.preventDefault(); dropZone.classList.remove('drag-over'); handleFile(e.dataTransfer.files[0]); });
+fileInput.addEventListener('change', function(e) { handleFile(e.target.files[0]); });
+
+function setProgress(pct, msg) {
+  document.getElementById('progressBar').style.width = pct + '%';
+  document.getElementById('statusMsg').textContent = msg;
+}
 
 async function handleFile(file) {
   if (!file || !file.name.endsWith('.zip')) { alert('Por favor subí un archivo .zip exportado de WhatsApp.'); return; }
@@ -165,118 +162,128 @@ async function handleFile(file) {
   document.getElementById('statsSection').style.display = 'none';
   setProgress(10, 'Leyendo archivo...');
 
-  const zip = new JSZip();
-  const content = await zip.loadAsync(file);
-  setProgress(30, 'Buscando mensajes...');
+  var zip = new JSZip();
+  var content = await zip.loadAsync(file);
+  setProgress(30, 'Buscando mensajes y archivos...');
 
-  let txtFile = null;
-  let txtContent = '';
-  const mediaFiles = {};
+  var txtContent = '';
+  var mediaFiles = {};
+  var mediaPromises = [];
 
-  const mediaPromises = [];
-  for (const [name, entry] of Object.entries(content.files)) {
-    const fname = name.split('/').pop();
-    if (!entry.dir && fname) {
-      if (fname.endsWith('.txt') && !txtFile) {
-        txtContent = await entry.async('string');
-        txtFile = fname;
-      } else if (fname.match(/\.(jpg|jpeg|png|gif|webp|mp4|3gp|mov|opus|ogg|mp3|wav|aac|pdf|doc|docx|xls|xlsx)$/i)) {
-        mediaPromises.push(
-          entry.async('uint8array').then(data => {
-            mediaFiles[fname] = { data, entry };
-          })
-        );
-      }
+  for (var name in content.files) {
+    var entry = content.files[name];
+    if (entry.dir) continue;
+    var fname = name.split('/').pop();
+    if (!fname) continue;
+
+    if (fname.toLowerCase().endsWith('.txt')) {
+      if (!txtContent) txtContent = await entry.async('string');
+    } else if (/\.(jpg|jpeg|png|gif|webp|mp4|3gp|mov|opus|ogg|mp3|wav|aac|pdf|doc|docx|xls|xlsx)$/i.test(fname)) {
+      (function(n, ent) {
+        mediaPromises.push(ent.async('uint8array').then(function(data) { mediaFiles[n] = data; }));
+      })(fname, entry);
     }
   }
-  setProgress(45, 'Leyendo archivos multimedia...');
+
+  setProgress(50, 'Leyendo archivos multimedia...');
   await Promise.all(mediaPromises);
+  setProgress(70, 'Clasificando por semanas...');
 
-  if (!txtContent) { alert('No se encontró el archivo de mensajes .txt dentro del ZIP. Asegurate de exportar el chat correctamente.'); return; }
+  if (!txtContent) {
+    alert('No se encontró el archivo de mensajes .txt. Exportá el chat desde WhatsApp correctamente.');
+    document.getElementById('progressSection').style.display = 'none';
+    return;
+  }
 
-  setProgress(60, 'Clasificando por semanas...');
   parsedData = parseChat(txtContent, mediaFiles);
-  parsedData._mediaKeys = mediaFiles;
   setProgress(90, 'Construyendo vista...');
-
   renderResults(parsedData);
   setProgress(100, 'Listo.');
-  setTimeout(() => document.getElementById('progressSection').style.display = 'none', 800);
+  setTimeout(function() { document.getElementById('progressSection').style.display = 'none'; }, 600);
   document.getElementById('statsSection').style.display = 'block';
 }
 
-function setProgress(pct, msg) {
-  document.getElementById('progressBar').style.width = pct + '%';
-  document.getElementById('statusMsg').textContent = msg;
-}
-
 function getWeekKey(date) {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  const mon = new Date(d.setDate(diff));
-  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
-  const fmt = d2 => d2.toLocaleDateString('es-PY', { day: '2-digit', month: '2-digit', year: 'numeric' });
-  return { key: mon.toISOString().slice(0, 10), label: `Semana del ${fmt(mon)} al ${fmt(sun)}` };
+  var d = new Date(date);
+  var day = d.getDay();
+  var diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  var mon = new Date(d.getFullYear(), d.getMonth(), diff);
+  var sun = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + 6);
+  function fmt(d2) { return d2.toLocaleDateString('es-PY', { day: '2-digit', month: '2-digit', year: 'numeric' }); }
+  return { key: mon.toISOString().slice(0, 10), label: 'Semana del ' + fmt(mon) + ' al ' + fmt(sun) };
 }
 
 function parseDate(str) {
-  // Formats: d/m/yy, d/m/yyyy, dd/mm/yy, dd/mm/yyyy
-  const m = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+  var m = str.match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
   if (!m) return null;
-  let y = parseInt(m[3]); if (y < 100) y += 2000;
+  var y = parseInt(m[3]); if (y < 100) y += 2000;
   return new Date(y, parseInt(m[2]) - 1, parseInt(m[1]));
 }
 
+function detectAttachment(body, mediaFiles) {
+  var clean = body.replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, '').trim();
+  var exts = 'jpg|jpeg|png|gif|webp|mp4|3gp|mov|opus|ogg|mp3|wav|aac|pdf|doc|docx|xls|xlsx';
+
+  // Formato: <adjunto: archivo.jpg> o <attached: archivo.jpg>
+  var m = clean.match(/<(?:adjunto|attached):\s*(.+?)>/i);
+  if (m) return resolveFile(m[1].trim(), mediaFiles);
+
+  // Formato: archivo.jpg (archivo adjunto) o archivo.jpg omitido
+  m = clean.match(new RegExp('^([\\w\\-\\.\\s]+\\.(?:' + exts + '))\\s*(?:\\(archivo adjunto\\)|\\(file attached\\)|omitido|omitted)?\\s*$', 'i'));
+  if (m) return resolveFile(m[1].trim(), mediaFiles);
+
+  // Formato: cualquier nombre con extensión conocida en el mensaje
+  m = clean.match(new RegExp('[\\w\\-\\.]+\\.(?:' + exts + ')', 'i'));
+  if (m) return resolveFile(m[0].trim(), mediaFiles);
+
+  return null;
+}
+
+function resolveFile(name, mediaFiles) {
+  if (!name) return null;
+  if (mediaFiles[name]) return name;
+  var keys = Object.keys(mediaFiles);
+  for (var i = 0; i < keys.length; i++) {
+    if (keys[i].toLowerCase() === name.toLowerCase()) return keys[i];
+  }
+  return null;
+}
+
 function parseChat(text, mediaFiles) {
-  const lines = text.split('\n');
-  // Match: dd/mm/yy, HH:MM - Sender: message
-  const lineRegex = /^(\d{1,2}\/\d{1,2}\/\d{2,4}),\s*(\d{1,2}:\d{2}(?::\d{2})?(?:\s*[APap][Mm])?)\s*[-–]\s*([^:]+?):\s*(.+)/;
-  const sysRegex = /^(\d{1,2}\/\d{1,2}\/\d{2,4}),\s*(\d{1,2}:\d{2})/;
-  const mediaRegex = /<adjunto:\s*(.+?)>|<Media omitted>|<archivo adjunto:\s*(.+?)>/i;
-  const fileNameRegex = /([^\s]+\.(jpg|jpeg|png|gif|mp4|3gp|pdf|doc|docx|xls|xlsx|opus|ogg|mp3|wav|aac|webp))/i;
+  var lines = text.split('\n');
+  var lineRegex = /^(\d{1,2}\/\d{1,2}\/\d{2,4}),\s*(\d{1,2}:\d{2}(?::\d{2})?(?:\s*[APap][Mm])?)\s*[-\u2013]\s*([^:]+?):\s*(.+)/;
+  var weeks = {};
+  var totalMsg = 0, totalFoto = 0, totalVideo = 0, totalDoc = 0, totalAudio = 0;
 
-  const weeks = {};
-  let totalMsg = 0, totalFoto = 0, totalVideo = 0, totalDoc = 0, totalAudio = 0;
-
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
-    if (!line) continue;
-    const match = line.match(lineRegex);
+  for (var i = 0; i < lines.length; i++) {
+    var trimmed = lines[i].trim();
+    if (!trimmed) continue;
+    var match = trimmed.match(lineRegex);
     if (!match) continue;
-    const [, dateStr, timeStr, sender, body] = match;
-    const date = parseDate(dateStr);
+    var dateStr = match[1], timeStr = match[2], sender = match[3], body = match[4];
+    var date = parseDate(dateStr);
     if (!date) continue;
-    const { key, label } = getWeekKey(date);
-    if (!weeks[key]) weeks[key] = { label, key, messages: [], media: [] };
+    var wk = getWeekKey(date);
+    if (!weeks[wk.key]) weeks[wk.key] = { label: wk.label, key: wk.key, messages: [], media: [] };
 
-    const cleanBody = body.replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, '').trim();
-    const mA = cleanBody.match(/<adjunto:\s*(.+?)>/i) || cleanBody.match(/<attached:\s*(.+?)>/i) ||
-               cleanBody.match(/^([^\s].+?\.(jpg|jpeg|png|gif|webp|mp4|3gp|mov|opus|ogg|mp3|wav|aac|pdf|doc|docx|xls|xlsx))\s*(?:\(archivo adjunto\)|\(file attached\)|omitido|omitted)?$/i);
-    const mB = cleanBody.match(/([^\s\/\\]+\.(jpg|jpeg|png|gif|webp|mp4|3gp|mov|opus|ogg|mp3|wav|aac|pdf|doc|docx|xls|xlsx))/i);
-    let attachedName = mA ? mA[1].trim() : (mB ? mB[1].trim() : null);
-    if (attachedName && !mediaFiles[attachedName]) {
-      const found = Object.keys(mediaFiles).find(k => k.toLowerCase() === attachedName.toLowerCase());
-      if (found) attachedName = found; else attachedName = null;
-    }
+    var attachedName = detectAttachment(body, mediaFiles);
 
     if (attachedName) {
-      const ext = attachedName.split('.').pop().toLowerCase();
-      let type = 'doc';
-      if (['jpg','jpeg','png','gif','webp'].includes(ext)) { type = 'foto'; totalFoto++; }
-      else if (['mp4','3gp','mov'].includes(ext)) { type = 'video'; totalVideo++; }
-      else if (['opus','ogg','mp3','wav','aac'].includes(ext)) { type = 'audio'; totalAudio++; }
+      var ext = attachedName.split('.').pop().toLowerCase();
+      var type = 'doc';
+      if (['jpg','jpeg','png','gif','webp'].indexOf(ext) >= 0) { type = 'foto'; totalFoto++; }
+      else if (['mp4','3gp','mov'].indexOf(ext) >= 0) { type = 'video'; totalVideo++; }
+      else if (['opus','ogg','mp3','wav','aac'].indexOf(ext) >= 0) { type = 'audio'; totalAudio++; }
       else { totalDoc++; }
-      const mediaRef = mediaFiles[attachedName] || null;
-      weeks[key].media.push({ name: attachedName, type, date: dateStr, time: timeStr, sender, mediaRef });
+      weeks[wk.key].media.push({ name: attachedName, type: type, date: dateStr, time: timeStr, sender: sender });
     } else {
       totalMsg++;
-      weeks[key].messages.push({ date: dateStr, time: timeStr, sender, body });
+      weeks[wk.key].messages.push({ date: dateStr, time: timeStr, sender: sender, body: body });
     }
   }
 
-  const sorted = Object.values(weeks).sort((a, b) => a.key.localeCompare(b.key));
-  return { weeks: sorted, totalMsg, totalFoto, totalVideo, totalDoc, totalAudio };
+  var sorted = Object.values(weeks).sort(function(a, b) { return a.key.localeCompare(b.key); });
+  return { weeks: sorted, totalMsg: totalMsg, totalFoto: totalFoto, totalVideo: totalVideo, totalDoc: totalDoc, totalAudio: totalAudio, mediaFiles: mediaFiles };
 }
 
 function fileIcon(type) {
@@ -284,6 +291,10 @@ function fileIcon(type) {
   if (type === 'video') return '🎬';
   if (type === 'audio') return '🎤';
   return '📄';
+}
+
+function escapeHtml(t) {
+  return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function renderResults(data) {
@@ -294,7 +305,7 @@ function renderResults(data) {
   document.getElementById('statDocs').textContent = data.totalDoc;
   document.getElementById('statAudios').textContent = data.totalAudio;
 
-  const container = document.getElementById('weeksContainer');
+  var container = document.getElementById('weeksContainer');
   container.innerHTML = '';
 
   if (data.weeks.length === 0) {
@@ -302,110 +313,110 @@ function renderResults(data) {
     return;
   }
 
-  data.weeks.forEach((week, idx) => {
-    const totalFiles = week.media.length;
-    const fotos = week.media.filter(m => m.type === 'foto').length;
-    const videos = week.media.filter(m => m.type === 'video').length;
-    const docs = week.media.filter(m => m.type === 'doc').length;
-    const audios = week.media.filter(m => m.type === 'audio').length;
+  data.weeks.forEach(function(week, idx) {
+    var fotos = week.media.filter(function(m) { return m.type === 'foto'; }).length;
+    var videos = week.media.filter(function(m) { return m.type === 'video'; }).length;
+    var docs = week.media.filter(function(m) { return m.type === 'doc'; }).length;
+    var audios = week.media.filter(function(m) { return m.type === 'audio'; }).length;
 
-    const block = document.createElement('div');
+    var msgsHtml = '';
+    if (week.messages.length) {
+      msgsHtml = '<div class="section-title">Mensajes de texto</div><div class="messages-box">' +
+        week.messages.map(function(m) {
+          return '<div class="msg-line"><span class="msg-time">' + escapeHtml(m.time) + '</span> <span class="msg-sender">' + escapeHtml(m.sender) + ':</span> ' + escapeHtml(m.body) + '</div>';
+        }).join('') + '</div>';
+    }
+
+    var mediaHtml = '';
+    if (week.media.length) {
+      mediaHtml = '<div class="section-title">Archivos adjuntos</div><div class="files-grid">' +
+        week.media.map(function(m) {
+          return '<div class="file-item"><div class="file-icon">' + fileIcon(m.type) + '</div><div class="file-name">' + escapeHtml(m.name) + '</div><div class="file-date">' + escapeHtml(m.date) + ' ' + escapeHtml(m.time) + '</div></div>';
+        }).join('') + '</div>';
+    }
+
+    var block = document.createElement('div');
     block.className = 'week-block';
-    block.innerHTML = `
-      <div class="week-header" onclick="toggleWeek(${idx})">
-        <div>
-          <div class="week-title">📅 ${week.label}</div>
-          <div class="week-sub">${week.messages.length} mensajes · ${totalFiles} archivos</div>
-        </div>
-        <div style="display:flex; gap:8px; align-items:center;">
-          <div class="week-badges">
-            ${fotos ? `<span class="badge foto">🖼️ ${fotos}</span>` : ''}
-            ${videos ? `<span class="badge video">🎬 ${videos}</span>` : ''}
-            ${docs ? `<span class="badge doc">📄 ${docs}</span>` : ''}
-            ${audios ? `<span class="badge audio">🎤 ${audios}</span>` : ''}
-            ${week.messages.length ? `<span class="badge msg">💬 ${week.messages.length}</span>` : ''}
-          </div>
-          <div class="chevron" id="chev-${idx}">▼</div>
-        </div>
-      </div>
-      <div class="week-body" id="body-${idx}">
-        ${week.messages.length ? `
-          <div class="section-title">Mensajes de texto</div>
-          <div class="messages-box">
-            ${week.messages.map(m => `
-              <div class="msg-line">
-                <span class="msg-time">${m.time}</span>
-                <span class="msg-sender">${m.sender}:</span>
-                ${escapeHtml(m.body)}
-              </div>`).join('')}
-          </div>` : ''}
-        ${week.media.length ? `
-          <div class="section-title">Archivos adjuntos</div>
-          <div class="files-grid">
-            ${week.media.map(m => `
-              <div class="file-item">
-                <div class="file-icon">${fileIcon(m.type)}</div>
-                <div class="file-name">${escapeHtml(m.name)}</div>
-                <div class="file-date">${m.date} ${m.time}</div>
-              </div>`).join('')}
-          </div>` : ''}
-      </div>
-    `;
+    block.innerHTML =
+      '<div class="week-header" onclick="toggleWeek(' + idx + ')">' +
+        '<div><div class="week-title">📅 ' + escapeHtml(week.label) + '</div>' +
+        '<div class="week-sub">' + week.messages.length + ' mensajes · ' + week.media.length + ' archivos</div></div>' +
+        '<div style="display:flex;gap:8px;align-items:center;">' +
+          '<div class="week-badges">' +
+            (fotos ? '<span class="badge foto">🖼️ ' + fotos + '</span>' : '') +
+            (videos ? '<span class="badge video">🎬 ' + videos + '</span>' : '') +
+            (docs ? '<span class="badge doc">📄 ' + docs + '</span>' : '') +
+            (audios ? '<span class="badge audio">🎤 ' + audios + '</span>' : '') +
+            (week.messages.length ? '<span class="badge msg">💬 ' + week.messages.length + '</span>' : '') +
+          '</div>' +
+          '<div class="chevron" id="chev-' + idx + '">▼</div>' +
+        '</div>' +
+      '</div>' +
+      '<div class="week-body" id="body-' + idx + '">' + msgsHtml + mediaHtml + '</div>';
+
     container.appendChild(block);
   });
 }
 
 function toggleWeek(idx) {
-  const body = document.getElementById('body-' + idx);
-  const chev = document.getElementById('chev-' + idx);
-  body.classList.toggle('open');
-  chev.classList.toggle('open');
+  document.getElementById('body-' + idx).classList.toggle('open');
+  document.getElementById('chev-' + idx).classList.toggle('open');
 }
 
-function escapeHtml(t) {
-  return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-}
-
-document.getElementById('diagBtn').addEventListener('click', () => {
+document.getElementById('diagBtn').addEventListener('click', function() {
   if (!parsedData) return;
-  const box = document.getElementById('diagBox');
-  box.style.display = box.style.display === 'none' ? 'block' : 'none';
-  let txt = '=== ARCHIVOS EN EL ZIP ===\n';
-  txt += Object.keys(parsedData._mediaKeys || {}).map(k => '  ' + k).join('\n') || '  (ninguno detectado)';
-  txt += '\n\n=== ARCHIVOS REFERENCIADOS EN CHAT ===\n';
-  for (const w of parsedData.weeks) {
-    for (const m of w.media) {
-      txt += `  ${m.name} → ${m.mediaRef ? 'ENCONTRADO ✓' : 'NO ENCONTRADO ✗'}\n`;
-    }
-  }
+  var box = document.getElementById('diagBox');
+  if (box.style.display === 'block') { box.style.display = 'none'; return; }
+  box.style.display = 'block';
+  var txt = '=== ARCHIVOS EN EL ZIP ===\n';
+  var keys = Object.keys(parsedData.mediaFiles || {});
+  txt += keys.length ? keys.map(function(k) { return '  ' + k; }).join('\n') : '  (ninguno)';
+  txt += '\n\n=== ARCHIVOS DETECTADOS EN CHAT ===\n';
+  parsedData.weeks.forEach(function(w) {
+    w.media.forEach(function(m) {
+      var found = parsedData.mediaFiles && parsedData.mediaFiles[m.name];
+      txt += '  ' + m.name + ' → ' + (found ? 'ENCONTRADO ✓' : 'NO ENCONTRADO ✗') + '\n';
+    });
+  });
   box.textContent = txt;
 });
+
+document.getElementById('downloadBtn').addEventListener('click', async function() {
   if (!parsedData) return;
-  const btn = document.getElementById('downloadBtn');
-  btn.disabled = true; btn.textContent = 'Generando ZIP...';
+  var btn = document.getElementById('downloadBtn');
+  btn.disabled = true;
+  btn.textContent = 'Preparando...';
 
-  const zip = new JSZip();
-  for (const week of parsedData.weeks) {
-    const folderName = week.label.replace(/[\/\\:*?"<>|]/g, '-');
-    const folder = zip.folder(folderName);
+  var zip = new JSZip();
 
+  for (var i = 0; i < parsedData.weeks.length; i++) {
+    var week = parsedData.weeks[i];
+    var folderName = week.label.replace(/[\/\\:*?"<>|]/g, '-');
+    var folder = zip.folder(folderName);
+
+    // Textos
     if (week.messages.length) {
-      const lines = week.messages.map(m => `[${m.date} ${m.time}] ${m.sender}: ${m.body}`).join('\n');
-      folder.file('mensajes.txt', lines);
+      var txtLines = week.messages.map(function(m) {
+        return '[' + m.date + ' ' + m.time + '] ' + m.sender + ': ' + m.body;
+      }).join('\n');
+      folder.file('mensajes.txt', txtLines);
     }
 
-    for (const m of week.media) {
-      if (m.mediaRef && m.mediaRef.data) {
-        folder.file(m.name, m.mediaRef.data);
-      }
+    // Multimedia
+    for (var j = 0; j < week.media.length; j++) {
+      var mf = week.media[j];
+      var data = parsedData.mediaFiles[mf.name];
+      if (data) folder.file(mf.name, data);
     }
   }
 
-  const blob = await zip.generateAsync({ type: 'blob', streamFiles: true }, (metadata) => {
-    btn.textContent = `Comprimiendo... ${Math.round(metadata.percent)}%`;
+  var blob = await zip.generateAsync({ type: 'blob' }, function(meta) {
+    btn.textContent = 'Comprimiendo... ' + Math.round(meta.percent) + '%';
   });
+
   saveAs(blob, 'obra-organizada.zip');
-  btn.disabled = false; btn.innerHTML = '⬇ Descargar todo organizado en carpetas';
+  btn.disabled = false;
+  btn.textContent = '⬇ Descargar todo organizado en carpetas';
 });
 </script>
 </body>
