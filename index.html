@@ -11,7 +11,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, sans-serif; background: #f4f4f0; color: #1a1a1a; min-height: 100vh; }
 
-  .header { background: #c2410c; color: white; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 12px; }
+  .header { background: #312e81; color: white; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 12px; }
   .header h1 { font-size: 18px; font-weight: 500; }
   .header p { font-size: 13px; opacity: 0.8; margin-top: 2px; }
 
@@ -582,15 +582,29 @@ async function generarPDFBytes(periodo, weeks) {
 
     for (let ti = 0; ti < timeline.length; ti++) {
       const item = timeline[ti];
+
+      // Limpiar texto para jsPDF — eliminar caracteres no ASCII
+      function cleanPDF(str) {
+        return String(str)
+          .replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, '')
+          .replace(/[^\x00-\xFF]/g, '?')
+          .trim();
+      }
+
+      const fechaHora = item.date + ' ' + item.time;
+      const senderClean = cleanPDF(item.sender);
+
       if (item.kind === 'msg') {
         checkPage(12);
-        doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(100,100,100);
-        doc.text(item.time + '  ' + item.sender, marginL+2, y); y += 4;
+        doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(80,80,80);
+        doc.text(fechaHora + '  ' + senderClean, marginL+2, y); y += 4;
         doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(30,30,30);
-        const lines = doc.splitTextToSize(item.body, W-4);
+        const bodyClean = cleanPDF(item.body);
+        const lines = doc.splitTextToSize(bodyClean, W-4);
         lines.forEach(function(line) { checkPage(5); doc.text(line, marginL+2, y); y += 4.5; });
         y += 1;
       } else if (item.kind === 'media') {
+        const nameClean = cleanPDF(item.name);
         if (item.type === 'foto') {
           const data = parsedData.mediaFiles[item.name];
           if (data) {
@@ -601,27 +615,29 @@ async function generarPDFBytes(periodo, weeks) {
               const b64 = btoa(binary);
               const ext = item.name.split('.').pop().toLowerCase();
               const mime = ext === 'png' ? 'PNG' : 'JPEG';
-              checkPage(55);
-              doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(100,100,100);
-              doc.text(item.time + '  ' + item.sender + '  — ' + item.name, marginL+2, y); y += 3;
+              checkPage(58);
+              doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(80,80,80);
+              doc.text(fechaHora + '  ' + senderClean, marginL+2, y); y += 3;
+              doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(120,120,120);
+              doc.text(nameClean, marginL+2, y); y += 3;
               doc.addImage('data:image/'+ext+';base64,'+b64, mime, marginL+2, y, 80, 50, '', 'FAST');
               y += 53;
             } catch(e) {
               checkPage(8);
               doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(150,100,0);
-              doc.text('[Foto: ' + item.name + ' — ' + item.time + ' — ' + item.sender + ']', marginL+2, y); y += 6;
+              doc.text('[Foto: ' + nameClean + ' — ' + fechaHora + ' — ' + senderClean + ']', marginL+2, y); y += 6;
             }
           } else {
             checkPage(8);
             doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(150,100,0);
-            doc.text('[Foto no disponible: ' + item.name + ' — ' + item.time + ']', marginL+2, y); y += 6;
+            doc.text('[Foto no disponible: ' + nameClean + ' — ' + fechaHora + ']', marginL+2, y); y += 6;
           }
         } else {
           checkPage(8);
           const icons = { audio:'[Audio]', video:'[Video]', doc:'[Doc]' };
           const icon = icons[item.type] || '[Archivo]';
           doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(80,80,150);
-          doc.text(icon + ' ' + item.name + ' — ' + item.time + ' — ' + item.sender, marginL+2, y); y += 6;
+          doc.text(icon + ' ' + nameClean + ' — ' + fechaHora + ' — ' + senderClean, marginL+2, y); y += 6;
         }
         doc.setTextColor(30,30,30);
       }
