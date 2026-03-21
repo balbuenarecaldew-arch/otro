@@ -11,7 +11,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, sans-serif; background: #f4f4f0; color: #1a1a1a; min-height: 100vh; }
 
-  .header { background: #9d174d; color: white; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 12px; }
+  .header { background: #c2410c; color: white; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 12px; }
   .header h1 { font-size: 18px; font-weight: 500; }
   .header p { font-size: 13px; opacity: 0.8; margin-top: 2px; }
 
@@ -144,6 +144,10 @@
       <div class="stat-card"><div class="num" id="statAudios">0</div><div class="lbl">Audios</div></div>
     </div>
     <div id="weeksContainer"></div>
+    <div style="display:flex;align-items:center;gap:10px;margin:1.2rem 0 0;background:white;padding:12px 16px;border-radius:10px;border:0.5px solid #e0e0e0;">
+      <label style="font-size:13px;color:#666;white-space:nowrap;">📁 Nombre del ZIP:</label>
+      <input type="text" id="groupNameInput" placeholder="Nombre del grupo o obra" style="flex:1;font-size:13px;padding:6px 10px;border-radius:6px;border:1px solid #ddd;">
+    </div>
     <button class="download-btn" id="downloadBtn">⬇ Descargar todo organizado en carpetas</button>
     <button class="diag-btn" id="diagBtn">🔍 Ver diagnóstico del ZIP</button>
     <div class="diag-box" id="diagBox"></div>
@@ -212,7 +216,16 @@ async function handleFile(file) {
   }
 
   parsedData = parseChat(txtContent, mediaFiles);
-  parsedData.groupName = detectGroupName(txtContent);
+  // Leer nombre del grupo directo del nombre del ZIP
+  // Extraer nombre del grupo desde el nombre del archivo ZIP
+  // Formatos posibles de WhatsApp:
+  // "Chat de WhatsApp con OBRA SAN MIGUEL.zip"
+  // "WhatsApp Chat with OBRA SAN MIGUEL.zip"
+  // "Chat con OBRA SAN MIGUEL.zip"
+  // "Exportación de chat de WhatsApp con OBRA SAN MIGUEL.zip"
+  var zipName = file.name.replace(/\.zip$/i, '').trim();
+  var nameMatch = zipName.match(/(?:exportaci[oó]n\s+de\s+chat\s+de\s+whatsapp\s+con\s+|chat\s+de\s+whatsapp\s+con\s+|whatsapp\s+chat\s+with\s+|chat\s+con\s+|whatsapp\s+-\s+)(.+)/i);
+  parsedData.groupName = nameMatch ? nameMatch[1].trim() : zipName;
   setProgress(90, 'Construyendo vista...');
   renderResults(parsedData);
   setProgress(100, 'Listo.');
@@ -272,21 +285,28 @@ function resolveFile(name, mediaFiles) {
 }
 
 function detectGroupName(text) {
-  // WhatsApp pone el nombre en la primera línea del .txt o en el nombre del archivo
-  // Formato típico: "Los mensajes y las llamadas están cifrados de extremo a extremo..."
-  // El nombre del grupo suele aparecer en líneas de sistema al inicio
-  const lines = text.split('\n').slice(0, 10);
+  const lines = text.split('\n').slice(0, 20);
   for (var i = 0; i < lines.length; i++) {
-    var line = lines[i].replace(/[\u200e\u200f\u202a-\u202e]/g, '').trim();
-    // Buscar línea de sistema con nombre de grupo: "Se creó el grupo..." o "Messages and calls..."
-    var m = line.match(/[-–]\s*(.+?)\s*(?:creó el grupo|created group|agregó|added)/i);
+    var line = lines[i].replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g, '').trim();
+
+    // Formato: "dd/mm/yy, HH:MM - Nombre del grupo: ..."  — el remitente antes del primer ":" es el grupo? No.
+    // Formato sistema: "... creó el grupo "OBRA SAN MIGUEL""
+    var m = line.match(/creó el grupo [""«]?(.+?)[""»]?\s*$/i) ||
+            line.match(/created group [""«]?(.+?)[""»]?\s*$/i) ||
+            line.match(/created the group [""«]?(.+?)[""»]?\s*$/i) ||
+            line.match(/creou o grupo [""«]?(.+?)[""»]?\s*$/i);
     if (m) return m[1].trim();
-    // Otra forma: buscar "Historial de chat con X"
-    m = line.match(/(?:chat con|chat with|Historial de chat con)\s+(.+)/i);
+
+    // Formato: "Se creó el grupo" en línea aparte, nombre en línea siguiente
+    if (/se creó el grupo|group was created/i.test(line) && lines[i+1]) {
+      return lines[i+1].replace(/[\u200e\u200f]/g, '').trim();
+    }
+
+    // Formato nombre de archivo: "WhatsApp Chat - OBRA SAN MIGUEL.txt"
+    m = line.match(/WhatsApp Chat[\s\-–]+(.+?)(?:\.txt)?$/i);
     if (m) return m[1].trim();
   }
-  // Si no encuentra nada, buscar el nombre más repetido en remitentes del sistema
-  return 'Obra';
+  return null;
 }
 
 function parseChat(text, mediaFiles) {
