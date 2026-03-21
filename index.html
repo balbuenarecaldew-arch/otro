@@ -10,7 +10,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, sans-serif; background: #f4f4f0; color: #1a1a1a; min-height: 100vh; }
 
-  .header { background: #b45309; color: white; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 12px; }
+  .header { background: #1e3a1e; color: white; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 12px; }
   .header h1 { font-size: 18px; font-weight: 500; }
   .header p { font-size: 13px; opacity: 0.8; margin-top: 2px; }
 
@@ -383,34 +383,32 @@ document.getElementById('diagBtn').addEventListener('click', function() {
 
 document.getElementById('downloadBtn').addEventListener('click', async function() {
   if (!parsedData) return;
-  var btn = document.getElementById('downloadBtn');
+  const btn = document.getElementById('downloadBtn');
   btn.disabled = true;
   btn.textContent = 'Preparando...';
 
-  var zip = new JSZip();
+  const zip = new JSZip();
 
-  for (var i = 0; i < parsedData.weeks.length; i++) {
-    var week = parsedData.weeks[i];
-    var folderName = week.label.replace(/[\/\\:*?"<>|]/g, '-');
-    var folder = zip.folder(folderName);
+  for (let i = 0; i < parsedData.weeks.length; i++) {
+    const week = parsedData.weeks[i];
+    const folderName = week.label.replace(/[\/\\:*?"<>|]/g, '-');
+    const folder = zip.folder(folderName);
 
-    // Textos
-    if (week.messages.length) {
-      var txtLines = week.messages.map(function(m) {
-        return '[' + m.date + ' ' + m.time + '] ' + m.sender + ': ' + m.body;
-      }).join('\n');
-      folder.file('mensajes.txt', txtLines);
-    }
+    // Siempre crear mensajes.txt aunque no haya mensajes
+    const txtLines = week.messages.length
+      ? week.messages.map(m => '[' + m.date + ' ' + m.time + '] ' + m.sender + ': ' + m.body).join('\n')
+      : '(sin mensajes de texto esta semana)';
+    folder.file('mensajes.txt', txtLines);
 
     // Multimedia
-    for (var j = 0; j < week.media.length; j++) {
-      var mf = week.media[j];
-      var data = parsedData.mediaFiles[mf.name];
+    for (let j = 0; j < week.media.length; j++) {
+      const mf = week.media[j];
+      const data = parsedData.mediaFiles[mf.name];
       if (data) folder.file(mf.name, data);
     }
   }
 
-  var blob = await zip.generateAsync({ type: 'blob' }, function(meta) {
+  const blob = await zip.generateAsync({ type: 'blob' }, function(meta) {
     btn.textContent = 'Comprimiendo... ' + Math.round(meta.percent) + '%';
   });
 
