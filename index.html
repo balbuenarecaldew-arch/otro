@@ -11,7 +11,7 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: system-ui, sans-serif; background: #f4f4f0; color: #1a1a1a; min-height: 100vh; }
 
-  .header { background: #0e7490; color: white; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 12px; }
+  .header { background: #9d174d; color: white; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 12px; }
   .header h1 { font-size: 18px; font-weight: 500; }
   .header p { font-size: 13px; opacity: 0.8; margin-top: 2px; }
 
@@ -212,6 +212,7 @@ async function handleFile(file) {
   }
 
   parsedData = parseChat(txtContent, mediaFiles);
+  parsedData.groupName = detectGroupName(txtContent);
   setProgress(90, 'Construyendo vista...');
   renderResults(parsedData);
   setProgress(100, 'Listo.');
@@ -268,6 +269,24 @@ function resolveFile(name, mediaFiles) {
     if (keys[i].toLowerCase() === name.toLowerCase()) return keys[i];
   }
   return null;
+}
+
+function detectGroupName(text) {
+  // WhatsApp pone el nombre en la primera línea del .txt o en el nombre del archivo
+  // Formato típico: "Los mensajes y las llamadas están cifrados de extremo a extremo..."
+  // El nombre del grupo suele aparecer en líneas de sistema al inicio
+  const lines = text.split('\n').slice(0, 10);
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i].replace(/[\u200e\u200f\u202a-\u202e]/g, '').trim();
+    // Buscar línea de sistema con nombre de grupo: "Se creó el grupo..." o "Messages and calls..."
+    var m = line.match(/[-–]\s*(.+?)\s*(?:creó el grupo|created group|agregó|added)/i);
+    if (m) return m[1].trim();
+    // Otra forma: buscar "Historial de chat con X"
+    m = line.match(/(?:chat con|chat with|Historial de chat con)\s+(.+)/i);
+    if (m) return m[1].trim();
+  }
+  // Si no encuentra nada, buscar el nombre más repetido en remitentes del sistema
+  return 'Obra';
 }
 
 function parseChat(text, mediaFiles) {
@@ -442,7 +461,8 @@ document.getElementById('downloadBtn').addEventListener('click', async function(
     btn.textContent = 'Comprimiendo... ' + Math.round(meta.percent) + '%';
   });
 
-  saveAs(blob, 'obra-organizada.zip');
+  const nombreZip = (parsedData.groupName || 'Obra').replace(/[\/\\:*?"<>|]/g, '-') + '.zip';
+  saveAs(blob, nombreZip);
   btn.disabled = false;
   btn.textContent = '⬇ Descargar todo organizado en carpetas';
 });
